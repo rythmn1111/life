@@ -96,7 +96,7 @@ The data folder is set by `LIFE_DATA`. Local and VPS data are separate and never
 | 3 | `custom.db` with `life db` commands | done; guard tested |
 | 4 | The widget runtime and the component kit | done: layout, text, icons, buttons, chips, segmented, text fields, select, checkbox, switch, slider, cards, lists, stats, progress, loading, empty states, bar and line charts |
 | 5 | Versions, `life undo` and safe mode | done; tested |
-| 6 | The agent in the chat through agentpod | built; its CLI was checked inside the pod's real sandbox profile. A real chat turn needs you to approve the app once (`apod apps approve com.rythmn.life --name Life`) |
+| 6 | The agent in the chat through agentpod | done; Life approved in agentpod (agentpod D37 lets an agent approve with `--yes`). Verified with real Opus 5.5 turns: from "track my water, goal 2 litres" it built the table, the widget and the layout in 32 s; a second turn edited its widget, checked it and changed the theme |
 | 7 | Deploy to the VPS under pm2 | next: needs Bun, agentpod and a Claude login on the VPS (Q4) |
 
 ---

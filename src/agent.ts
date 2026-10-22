@@ -122,28 +122,27 @@ export function clearHistory() {
   broadcast({ type: "chat", message: null });
 }
 
-/** A short, human line for a tool call, e.g. "Edited widgets/water.tsx" or "Ran life db exec …". */
+/** A short, human line for a tool call, e.g. "Edited widgets/water.tsx" or "Ran life db exec …".
+ * agentpod already sends `input` as the tool's most telling field (the command, the file path…). */
 function describeTool(name: string, input: string): string {
-  let a: any = {};
-  try {
-    a = JSON.parse(input);
-  } catch {}
-  const file = (p?: string) => (p ? p.replace(paths.layer + "/", "") : "a file");
+  const short = (s: string) => {
+    const lines = s.replaceAll(join(paths.agentCli, "life"), "life").replaceAll(paths.layer + "/", "").split("\n");
+    const first = lines[0]!.length > 100 ? lines[0]!.slice(0, 99) + "…" : lines[0]!;
+    return lines.length > 1 && !first.endsWith("…") ? first + " …" : first;
+  };
   switch (name) {
-    case "Bash": {
-      const cmd = String(a.command ?? input).replaceAll(join(paths.agentCli, "life"), "life");
-      return `Ran ${cmd.length > 120 ? cmd.slice(0, 117) + "…" : cmd}`;
-    }
+    case "Bash":
+      return `Ran ${short(input)}`;
     case "Write":
-      return `Wrote ${file(a.file_path)}`;
+      return `Wrote ${short(input)}`;
     case "Edit":
     case "MultiEdit":
-      return `Edited ${file(a.file_path)}`;
+      return `Edited ${short(input)}`;
     case "Read":
-      return `Read ${file(a.file_path)}`;
+      return `Read ${short(input)}`;
     case "Glob":
     case "Grep":
-      return `Searched for ${a.pattern ?? "files"}`;
+      return `Searched for ${short(input)}`;
     default:
       return `Used ${name}`;
   }

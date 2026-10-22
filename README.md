@@ -11,7 +11,7 @@ Needs [Bun](https://bun.sh) and, for the agent, [agentpod](https://github.com/ry
 ```sh
 bun install
 bun src/cli.ts passwd                              # set the dashboard password
-apod apps approve com.rythmn.life --name Life      # once, in your own terminal: lets Life use agentpod
+apod apps approve com.rythmn.life --name Life      # once: lets Life use agentpod (an agent adds --yes)
 bun src/server.ts                                  # http://127.0.0.1:8810
 ```
 
