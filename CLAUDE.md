@@ -14,4 +14,13 @@ Every change goes through these steps, in this order:
 - Skip a step, for example by copying files to the server with `scp` or `rsync` instead of going through GitHub.
 
 ### If something is broken on the VPS
-Reproduce it locally, fix it locally, then commit, push, pull and redeploy. Server-only state (secrets, `.env` files, data volumes) is the one exception: it stays out of git and is managed on the server.
+Reproduce it locally, fix it locally, then commit, push, pull and redeploy.
+
+## What the rule does not cover: the personal layer
+
+The rule is for the **core** (the app's own code). Personal stuff is the app's data, it is changed through the app itself, live on the VPS, and it never goes to GitHub:
+
+- **The personal layer:** custom UI code and the custom database agents create tables in. Editing it on the VPS is using the app, not deploying it.
+- **Server-only state:** secrets, `.env` files, the core database and other data volumes.
+
+The personal layer lives in a data folder outside the repo, and is backed up instead of committed. The local copy has its own separate personal layer for testing. If a customization needs something the core can't do, that is a core change and goes through the rule.
