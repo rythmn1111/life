@@ -1,7 +1,7 @@
 # life: design notes
 
 Living document. Decisions get a number (D1, D2, …) when they're settled; open questions stay open.
-**Status:** design, nothing built yet · **Last updated:** 2026-10-23
+**Status:** v1 built and tested locally; not on the VPS yet · **Last updated:** 2026-10-23
 
 ---
 
@@ -68,16 +68,19 @@ The data folder is set by `LIFE_DATA`. Local and VPS data are separate and never
 | D10 | **The agent lives in a chat panel in the dashboard.** It runs on the VPS in an agentpod pod, with your Claude subscription: read-write on the personal layer, read-only on the core code. | 2026-10-23 |
 | D11 | **Access, for now: the VPS IP, port 8810, plain HTTP, with a login.** HTTPS (Tailscale or a domain) comes later and needs no app changes. | 2026-10-23 |
 | D12 | **Single user.** Personal project; no accounts beyond yours. | 2026-10-23 |
+| D13 | **A widget is one `.tsx` file** in `layer/widgets/` whose default export is a React component (was Q1). The server compiles it with Bun; it may import only `react`, `@life/kit` and its own files (no packages, no `../`, no symlinks out). The dashboard loads each widget as a module inside its own error boundary. | 2026-10-23 |
+| D14 | **Widgets use SQL on `custom.db`** through the kit (`useQuery`, `exec`), which call the `db.query` and `db.exec` commands (was Q2). Queries run on a read-only connection; ATTACH, VACUUM INTO, extensions and most PRAGMAs are refused, so nothing reaches `core.db`. | 2026-10-23 |
+| D15 | **The CLI is a thin client** (was Q3). The server parses its arguments (`commands.ts`), so the CLI never falls behind. Tokens: *admin* (you; written to `<data>/cli.json` for this machine, `life token create` for others) and *agent* (the pod; can't send chat, stop or clear). | 2026-10-23 |
+| D16 | **One version per agent turn.** A snapshot is taken before each turn and dropped if nothing changed; the chat shows "Undo these changes" on turns that changed something. | 2026-10-23 |
+| D17 | **Each message is a fresh pod run** (was Q5, for v1). The task carries the last 12 messages and a summary of the dashboard (widgets, tables). | 2026-10-23 |
+| D18 | **Widget code can't send data anywhere.** The page's Content-Security-Policy allows network requests only to the app itself. | 2026-10-23 |
 
 ---
 
 ## 5. Open questions
 
-- **Q1. Widget format.** What exactly a widget is (a TSX module, an HTML fragment, a declarative spec), and how it's isolated in the browser (iframe or in-page error boundary). Decides how much freedom the agent has and how D6 is enforced.
-- **Q2. How widgets read and write data.** Through commands only, or raw SQL on `custom.db`? Leaning: a small data hook in the component kit that calls commands.
-- **Q3. Remote CLI.** How `life` authenticates when used from the laptop against the VPS (a token).
+- ~~Q1~~ → D13 · ~~Q2~~ → D14 · ~~Q3~~ → D15 · ~~Q5~~ → D17 (for v1)
 - **Q4. The agent on the VPS.** agentpod hasn't run there with real logins yet, and the VPS runs everything as `root`. Verify before relying on it.
-- **Q5. Agent memory.** One long conversation, or new sessions with a summary of what's been built?
 - **Q6. Automations.** The agent acting on its own: reminders, a morning brief, weekly reviews. Later.
 - **Q7. Backups.** Where and how often the data folder is copied.
 - **Q8. HTTPS.** Tailscale (free, your devices only) or a domain on Cloudflare (~$10/year, any browser). Until then, avoid public Wi-Fi: the login and data travel unencrypted.
@@ -86,16 +89,19 @@ The data folder is set by `LIFE_DATA`. Local and VPS data are separate and never
 
 ## 6. v1 (first build, local first)
 
-1. The shell: M3 web app, login, empty dashboard, chat panel.
-2. The command layer, its HTTP API, and the `life` CLI on the same commands.
-3. `custom.db` with `life db` commands (create tables, insert, query).
-4. The widget runtime and a small component kit: card, list, form, stat, chart.
-5. Versions, `life undo` and safe mode.
-6. The agent in the chat panel through agentpod: on the Mac first, then on the VPS.
-7. Deploy to the VPS under pm2, following D1.
+| | Step | State |
+| --- | --- | --- |
+| 1 | The shell: M3 web app, login, empty dashboard, chat panel | done; checked in Chrome at desktop and phone sizes, light and dark |
+| 2 | The command layer, its HTTP API, and the `life` CLI on the same commands | done |
+| 3 | `custom.db` with `life db` commands | done; guard tested |
+| 4 | The widget runtime and the component kit | done: layout, text, icons, buttons, chips, segmented, text fields, select, checkbox, switch, slider, cards, lists, stats, progress, loading, empty states, bar and line charts |
+| 5 | Versions, `life undo` and safe mode | done; tested |
+| 6 | The agent in the chat through agentpod | built; its CLI was checked inside the pod's real sandbox profile. A real chat turn needs you to approve the app once (`apod apps approve com.rythmn.life --name Life`) |
+| 7 | Deploy to the VPS under pm2 | next: needs Bun, agentpod and a Claude login on the VPS (Q4) |
 
 ---
 
 ## Changelog
 - **2026-10-22:** Project created; deployment rule (D1); two ways in (D3).
 - **2026-10-23:** Core vs personal layer (D2, D4–D8); stack (D9); agent in a dashboard chat on the VPS (D10); access by IP for now (D11); single user (D12). This document started.
+- **2026-10-23:** v1 built: widget format (D13), SQL through the kit (D14), thin CLI and tokens (D15), a version per agent turn (D16), fresh pod runs with context (D17), CSP (D18).
