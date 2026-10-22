@@ -22,3 +22,6 @@ npm-debug.log*
 ._*
 .vscode/
 .idea/
+
+# App data: core.db, custom.db and the personal layer (D2)
+data/
