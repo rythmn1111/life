@@ -1,0 +1,44 @@
+/* The app's own pages (setup, offline), in Life's default Material 3 colors. */
+:root {
+  color-scheme: light dark;
+  --surface: #fdf7fe; --on-surface: #1d1b20; --on-surface-variant: #49454f; --container: #f3edf7;
+  --field: #e6e0e9; --primary: #6750a4; --on-primary: #ffffff; --error: #b3261e; --outline: #79747e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #141218; --on-surface: #e6e0e9; --on-surface-variant: #cac4d0; --container: #211f26;
+    --field: #36343b; --primary: #d0bcff; --on-primary: #381e72; --error: #f2b8b5; --outline: #938f99;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  display: grid; place-items: center; padding: 16px; background: var(--surface); color: var(--on-surface);
+  font: 400 14px/20px "Roboto Flex", system-ui, -apple-system, sans-serif; -webkit-app-region: drag;
+}
+main {
+  width: min(440px, 100%); display: flex; flex-direction: column; gap: 16px; padding: 32px 24px;
+  background: var(--container); border-radius: 28px; -webkit-app-region: no-drag;
+}
+.mark { width: 56px; height: 56px; display: grid; place-items: center; align-self: center; border-radius: 16px; background: var(--primary); color: var(--on-primary); }
+.mark span, .icon { font-family: "Material Symbols Rounded"; font-size: 32px; line-height: 1; font-variation-settings: "FILL" 1; }
+h1 { margin: 0; text-align: center; font: 400 24px/32px "Roboto Flex", system-ui, sans-serif; }
+p { margin: 0; color: var(--on-surface-variant); text-align: center; }
+code { font: 13px ui-monospace, Menlo, monospace; }
+input {
+  width: 100%; height: 56px; padding: 0 16px; border: 0; border-radius: 4px 4px 0 0; outline: none;
+  background: var(--field); color: var(--on-surface); font: 400 16px/24px "Roboto Flex", system-ui, sans-serif;
+  box-shadow: inset 0 -1px 0 var(--on-surface-variant);
+}
+input:focus { box-shadow: inset 0 -3px 0 var(--primary); }
+.error { color: var(--error); min-height: 20px; text-align: left; }
+.row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+button {
+  height: 40px; padding: 0 24px; border: 0; border-radius: 9999px; cursor: pointer;
+  font: 500 14px/20px "Roboto Flex", system-ui, sans-serif; letter-spacing: 0.1px;
+  transition: border-radius 350ms cubic-bezier(0.42, 1.67, 0.21, 0.9);
+}
+button:active { border-radius: 8px; }
+button.filled { background: var(--primary); color: var(--on-primary); }
+button.text { background: transparent; color: var(--primary); }
+button:disabled { opacity: 0.5; cursor: default; }

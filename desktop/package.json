@@ -1,0 +1,20 @@
+{
+  "name": "life-desktop",
+  "productName": "Life",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Life for macOS: your Life server in a native window",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "bun build.ts --js && electron .",
+    "build": "bun build.ts"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "@types/bun": "^1.4.4",
+    "electron": "^45.0.0"
+  },
+  "trustedDependencies": [
+    "electron"
+  ]
+}

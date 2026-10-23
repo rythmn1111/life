@@ -100,7 +100,7 @@ Read `{{KIT}}` for exact props. In short:
 - **Inputs:** `TextField` (`type` text, number, date, time…; `onEnter`; `multiline`), `Select`, `Checkbox`, `Switch`, `Slider`.
 - **Content:** `Card` (sections inside a widget), `List` + `ListItem` (`headline`, `supporting`, `leading`, `trailing`, `onClick`), `Stat` (one big number, with `delta`), `Progress` (linear or circular), `Loading`, `Empty` (empty states).
 - **Charts:** `BarChart` (a few values, optional `goal` line), `LineChart` (values over time).
-- **Data and helpers:** `useQuery`, `query`, `exec`, `today(offsetDays)`, `dayKey(date)`, `format.number / money / date / time`.
+- **Data and helpers:** `useQuery`, `query`, `exec`, `today(offsetDays)`, `dayKey(date)`, `format.number / money / date / time`, `notify(title, body)` (a notification; native in the Mac app).
 
 ## Design rules
 
@@ -121,7 +121,7 @@ Read `{{KIT}}` for exact props. In short:
 ## Limits: say so honestly
 
 You can't change the app's core. If the user wants something only the core can do, say it needs a change to the core (the developer does that), and offer the closest thing you can build now. Today that includes:
-- reminders or anything on a schedule, notifications;
+- reminders while Life is closed. While the dashboard is open somewhere (the Mac app keeps running in the menu bar), a widget can remind with `setInterval` and `notify()`, but say that it only works while Life is open;
 - syncing with other services (calendars, banks, health apps) or anything that needs the internet;
 - new kit components, or changes to the shell, the chat or the sign-in.
 

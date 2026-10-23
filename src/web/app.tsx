@@ -3,6 +3,7 @@
 
 import { Component, type ComponentType, type ErrorInfo, type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { type LifeEvent, cmd, onLife } from "./api";
+import { desktop } from "./desktop";
 import { Button, Chip, Icon, IconButton, Loading, Text, TextField } from "./kit";
 import { DEFAULT_THEME, type Theme, applyTheme } from "./theme";
 
@@ -100,15 +101,29 @@ function Shell() {
   const [chatOpen, setChatOpen] = useState(wide);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [focusChat, setFocusChat] = useState(0);
   const safe = useMemo(() => new URLSearchParams(location.search).has("safe"), []);
 
   useEffect(() => {
     const load = () => cmd<Theme>("theme.get").then(applyTheme, () => applyTheme(DEFAULT_THEME));
+    const working = (b: boolean) => {
+      setBusy(b);
+      desktop?.setBusy(b);
+    };
     load();
-    cmd("agent.status").then((s) => setBusy(s.busy), () => {});
+    cmd("agent.status").then((s) => working(s.busy), () => {});
+    // In the Mac app: the global shortcut opens the chat, ready to type.
+    desktop?.onOpenChat(() => {
+      setChatOpen(true);
+      setFocusChat((n) => n + 1);
+    });
     return onLife((e) => {
       if (e.type === "theme") load();
-      if (e.type === "turn") setBusy(e.state === "start");
+      if (e.type === "turn") working(e.state === "start");
+      // The agent answered while Life wasn't in front: tell the user.
+      if (e.type === "chat" && e.message?.role === "agent" && !document.hasFocus()) {
+        desktop?.notify(e.message.error ? "The agent hit a problem" : "The agent is done", firstLine(e.message.text));
+      }
     });
   }, []);
 
@@ -130,7 +145,7 @@ function Shell() {
         )}
         <Dashboard safe={safe} onAsk={ask} />
       </main>
-      {chatOpen && <Chat draft={draft} setDraft={setDraft} onClose={() => setChatOpen(false)} />}
+      {chatOpen && <Chat draft={draft} setDraft={setDraft} focus={focusChat} onClose={() => setChatOpen(false)} />}
       {!chatOpen && (
         <button className="fab" onClick={() => setChatOpen(true)}>
           <Icon name="auto_awesome" fill />
@@ -319,7 +334,7 @@ function WidgetHost({ id, title, gen, onAsk }: { id: string; title: string; gen:
 
 // ---------- the chat ----------
 
-function Chat({ draft, setDraft, onClose }: { draft: string; setDraft: (s: string) => void; onClose: () => void }) {
+function Chat({ draft, setDraft, focus, onClose }: { draft: string; setDraft: (s: string) => void; focus: number; onClose: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [busy, setBusy] = useState(false);
   const [live, setLive] = useState<string[]>([]);
@@ -352,6 +367,9 @@ function Chat({ draft, setDraft, onClose }: { draft: string; setDraft: (s: strin
     t.style.height = `${t.scrollHeight}px`;
     if (draft) t.focus();
   }, [draft]);
+  useEffect(() => {
+    if (focus) input.current?.focus();
+  }, [focus]);
 
   async function send() {
     const text = draft.trim();
@@ -452,6 +470,13 @@ function Chat({ draft, setDraft, onClose }: { draft: string; setDraft: (s: strin
       </form>
     </aside>
   );
+}
+
+/** The first line of a message, without Markdown marks, for notifications. */
+function firstLine(text: string): string {
+  const line = text.split("\n").find((l) => l.trim()) ?? "";
+  const plain = line.replace(/[*`#]/g, "").trim();
+  return plain.length > 140 ? plain.slice(0, 139) + "…" : plain;
 }
 
 /** Just enough Markdown for chat: paragraphs, lists, **bold**, `code` and code blocks. Never raw HTML. */

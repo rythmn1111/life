@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com" />
+    <title>Life</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+    <link rel="stylesheet" href="pages.css" />
+  </head>
+  <body>
+    <main>
+      <div class="mark"><span>cloud_off</span></div>
+      <h1>Can't reach your Life server</h1>
+      <p id="detail"></p>
+      <p>Trying again every 10 seconds.</p>
+      <div class="row">
+        <button class="filled" id="retry">Try again</button>
+        <button class="text" id="change">Change server</button>
+      </div>
+    </main>
+    <script src="offline.js"></script>
+  </body>
+</html>

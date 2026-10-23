@@ -37,6 +37,8 @@ A personal life dashboard that you build and run **together with your agent**.
                                        │
                                        └──▶ personal layer folder: widget code, versioned (D7)
 
+ Mac app (Electron, desktop/) ──▶ the same web UI, loaded from the server, plus menu bar, ⌘⇧L, notifications
+
  chat panel ──▶ agent (agentpod pod on the VPS)
                   rw: personal layer · ro: core code · drives everything through the life CLI
 ```
@@ -74,6 +76,9 @@ The data folder is set by `LIFE_DATA`. Local and VPS data are separate and never
 | D16 | **One version per agent turn.** A snapshot is taken before each turn and dropped if nothing changed; the chat shows "Undo these changes" on turns that changed something. | 2026-10-23 |
 | D17 | **Each message is a fresh pod run** (was Q5, for v1). The task carries the last 12 messages and a summary of the dashboard (widgets, tables). | 2026-10-23 |
 | D18 | **Widget code can't send data anywhere.** The page's Content-Security-Policy allows network requests only to the app itself. | 2026-10-23 |
+| D19 | **On the Mac, Life is an Electron app that's a client of the server** (the VPS; or a local server). It loads the UI from the server, so core updates reach it without rebuilding, and adds a menu bar icon, a global shortcut (⌘⇧L) to the agent, notifications and launch at login. Everywhere else, the web UI. It's its own package (`desktop/`), built on the Mac and never deployed, so the server never installs Electron. | 2026-10-23 |
+| D20 | **The Mac app's bridge is small** (`window.lifeDesktop`): notify, report the agent's busy state, hear the shortcut. Pages get no Node access (context isolation, sandbox); only the app's own setup and offline pages may change the server; other sites open in the browser. | 2026-10-23 |
+| D21 | **Widgets can notify** (`notify()` in the kit): native in the Mac app, browser notifications over HTTPS. Reminders work while the dashboard is open somewhere, e.g. the Mac app in the menu bar; reminders while everything is closed still need the core (Q6). | 2026-10-23 |
 
 ---
 
@@ -98,10 +103,12 @@ The data folder is set by `LIFE_DATA`. Local and VPS data are separate and never
 | 5 | Versions, `life undo` and safe mode | done; tested |
 | 6 | The agent in the chat through agentpod | done; Life approved in agentpod (agentpod D37 lets an agent approve with `--yes`). Verified with real Opus 5.5 turns: from "track my water, goal 2 litres" it built the table, the widget and the layout in 32 s; a second turn edited its widget, checked it and changed the theme |
 | 7 | Deploy to the VPS under pm2 | next: needs Bun, agentpod and a Claude login on the VPS (Q4) |
+| 8 | The Mac app (D19–D21) | done: `desktop/`; packaged `Life.app` checked against a test server (bridge, sign-in kept across launches, first-run setup, offline page) |
 
 ---
 
 ## Changelog
 - **2026-10-22:** Project created; deployment rule (D1); two ways in (D3).
 - **2026-10-23:** Core vs personal layer (D2, D4–D8); stack (D9); agent in a dashboard chat on the VPS (D10); access by IP for now (D11); single user (D12). This document started.
+- **2026-10-23:** The Mac app: an Electron client of the server with menu bar, shortcut, notifications and launch at login (D19–D21).
 - **2026-10-23:** v1 built: widget format (D13), SQL through the kit (D14), thin CLI and tokens (D15), a version per agent turn (D16), fresh pod runs with context (D17), CSP (D18).

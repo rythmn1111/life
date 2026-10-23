@@ -198,3 +198,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
   background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-radius: var(--md-sys-shape-corner-large);
 }
 .signin code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* ---------- the Mac app (desktop/): room for the window buttons, and draggable title areas ---------- */
+html.desktop .topbar, html.desktop .chat header, html.desktop .signin { -webkit-app-region: drag; }
+html.desktop :is(.topbar, .chat header) :is(button, a, .menu), html.desktop .signin form { -webkit-app-region: no-drag; }
+html.desktop-darwin .topbar .titles { padding-left: 68px; }
+@media (max-width: 999px) { html.desktop-darwin .chat header { padding-left: 84px; } }

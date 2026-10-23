@@ -4,6 +4,7 @@
 
 import { type CSSProperties, type ReactNode, useCallback, useEffect, useId, useRef, useState } from "react";
 import { cmd, onLife } from "../api";
+import { desktop } from "../desktop";
 
 // ---------- data: custom.db (D8) ----------
 
@@ -35,6 +36,15 @@ export function useQuery<T = Record<string, any>>(sql: string, params?: Params):
     return onLife((e) => e.type === "data" && refresh());
   }, [refresh]);
   return { ...state, refresh };
+}
+
+/** A notification: native in the Mac app; in a browser only over HTTPS and if the user allows it.
+ * It shows while the dashboard is open somewhere, e.g. the Mac app running in the menu bar. */
+export function notify(title: string, body = ""): void {
+  if (desktop) return desktop.notify(title, body);
+  if (typeof Notification === "undefined" || !isSecureContext) return;
+  if (Notification.permission === "granted") new Notification(title, { body });
+  else if (Notification.permission === "default") Notification.requestPermission().then((p) => p === "granted" && new Notification(title, { body }));
 }
 
 /** Today's date in the user's time zone, as "YYYY-MM-DD" (the format to store dates in). */

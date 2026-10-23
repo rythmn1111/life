@@ -47,6 +47,21 @@ On the server's machine the CLI finds the server by itself. From another machine
 
 Settings: `LIFE_DATA` (data folder), `LIFE_HOST` and `LIFE_PORT` (default `127.0.0.1:8810`), `LIFE_MODEL` (default `claude-opus-5-5`), `LIFE_DEV=1` (rebuild the UI when `src/web` changes).
 
+## The Mac app
+
+`desktop/` is Life for macOS (Electron): a native window onto your Life server. The UI comes from the server, so updates to the core reach the app without rebuilding it. It adds what a browser tab can't:
+
+- **⌘⇧L from anywhere** opens Life with the agent's chat ready to type;
+- a **menu bar icon**: open Life, ask the agent, see if it's working, change server, launch at login, quit;
+- **notifications** when the agent finishes while Life isn't in front, and `notify()` for widgets (reminders work while the app runs in the menu bar);
+- closing the window keeps Life in the menu bar; ⌘Q quits.
+
+```sh
+cd desktop && bun install && bun run build      # → desktop/out/Life-darwin-arm64/Life.app
+```
+
+Drag `Life.app` to Applications. On first launch it asks for the server: `http://<your VPS IP>:8810`, or `http://127.0.0.1:8810` for a local one (change it later from the menu bar). `bun run dev` runs it without packaging. The icons come from `bun scripts/icons.ts` (needs Google Chrome). The app is built on your Mac from this repo; it's never deployed to the VPS.
+
 ## Deploy (VPS)
 
 Always: test locally, commit and push, then on the VPS (`,server`):
